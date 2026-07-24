@@ -16,32 +16,51 @@
         }
         h1 {
             color: white;
-            font-size: 28px; /* Più piccolo */
+            font-size: 28px;
             margin-bottom: 20px;
             text-align: center;
         }
         .calendario {
             background: white;
-            padding: 10px; /* Meno padding */
+            padding: 0;
             border-radius: 10px;
             text-align: center;
-            font-size: 14px; /* Più piccolo */
-            width: 220px; /* Più stretto */
+            font-size: 14px;
+            width: 220px;
+            overflow: hidden;
+        }
+        .mese {
+            background-color: #2c3e50;
+            color: white;
+            padding: 8px 0;
+            font-size: 16px;
+            font-weight: bold;
+            border-bottom: 3px solid #e74c3c;
         }
         .calendario table {
             width: 100%;
             border-collapse: collapse;
+            padding: 8px;
         }
         .calendario td, .calendario th {
-            padding: 5px; /* Meno spazio tra i numeri */
+            padding: 5px;
             text-align: center;
         }
-        .calendario h3 {
-            margin: 5px 0 8px 0; /* Meno margine sopra/sotto il titolo */
-            font-size: 16px;
+        .calendario th {
+            font-weight: bold;
+            color: #555;
         }
-        .cerchiato {
+        .calendario table {
+            padding: 8px;
+        }
+        .cerchiato-rosso {
             background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        .cerchiato-blu {
+            background-color: #3498db;
             color: white;
             border-radius: 50%;
             font-weight: bold;
@@ -51,14 +70,14 @@
 <body>
     <h1>LA TUA SCRITTA QUI</h1>
     <div class="calendario">
-        <h3>Luglio 2026</h3>
+        <div class="mese">Luglio 2026</div>
         <table>
             <tr><th>L</th><th>M</th><th>M</th><th>G</th><th>V</th><th>S</th><th>D</th></tr>
             <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
             <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
             <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
-            <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
-            <tr><td>27</td><td>28</td><td>29</td><td class="cerchiato">30</td><td>31</td><td></td><td></td></tr>
+            <tr><td>20</td><td>21</td><td>22</td><td class="cerchiato-blu">23</td><td>24</td><td>25</td><td>26</td></tr>
+            <tr><td>27</td><td>28</td><td>29</td><td class="cerchiato-rosso">30</td><td>31</td><td></td><td></td></tr>
         </table>
     </div>
 </body>
