@@ -236,11 +236,10 @@
             z-index: 100;
             display: none;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             padding: 20px;
             overflow-y: auto;
-            transition: background-color 0.3s;
         }
 
         #taskOverlay.active {
@@ -253,22 +252,48 @@
             background: #2d2d2d;
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            padding: 20px 30px;
+            padding: 15px 25px 20px;
             max-height: 90vh;
             overflow-y: auto;
-            transition: background-color 0.3s;
+        }
+
+        /* ========== TASK OVERLAY TOP BAR ========== */
+        .task-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0px;
+            padding: 0;
+            min-height: 40px;
+        }
+
+        .task-top-bar .back-link {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            flex-shrink: 0;
+        }
+
+        .task-top-bar .back-link:hover {
+            text-decoration: underline;
         }
 
         #taskOverlay .header {
             text-align: center;
-            padding: 5px 0 15px 0;
+            padding: 0px 0 10px 0;
+            flex: 1;
         }
 
         #taskOverlay .header h1 {
             color: #f0f0f0;
-            font-size: 2.2rem;
+            font-size: 2rem;
             pointer-events: auto;
             padding: 0;
+            margin: 0;
         }
 
         #taskOverlay .header h1 span {
@@ -278,45 +303,48 @@
         #taskOverlay .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 10px 0;
+            gap: 12px;
+            margin: 5px 0;
         }
 
         #taskOverlay .quadrant {
             border: 2px solid #444;
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px 12px;
             background: #222;
-            min-height: 200px;
+            min-height: 180px;
             display: flex;
             flex-direction: column;
         }
 
         #taskOverlay .quadrant-title {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: bold;
             color: #ccc;
             background: #333;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         #taskOverlay .input-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
         }
 
         #taskOverlay .input-row input {
             flex: 1;
-            padding: 6px 10px;
+            padding: 5px 8px;
             border: 1px solid #555;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             background: #333;
             color: #eee;
+            min-width: 0;
         }
 
         #taskOverlay .input-row input:focus {
@@ -329,15 +357,16 @@
         }
 
         #taskOverlay .input-row button {
-            padding: 6px 14px;
+            padding: 5px 12px;
             background: #3498db;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: background 0.2s;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         #taskOverlay .input-row button:hover {
@@ -347,17 +376,17 @@
         #taskOverlay .task-list {
             flex: 1;
             overflow-y: auto;
-            max-height: 200px;
+            max-height: 180px;
         }
 
         #taskOverlay .task-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 5px 8px;
+            padding: 4px 6px;
             background: #2a2a2a;
             border-radius: 6px;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             border: 1px solid #444;
             transition: background 0.2s;
         }
@@ -369,20 +398,23 @@
         #taskOverlay .task-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex: 1;
+            min-width: 0;
         }
 
         #taskOverlay .task-left input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
+            width: 15px;
+            height: 15px;
             cursor: pointer;
             accent-color: #27ae60;
+            flex-shrink: 0;
         }
 
         #taskOverlay .task-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #eee;
+            word-break: break-word;
         }
 
         #taskOverlay .task-text.done {
@@ -392,15 +424,17 @@
 
         #taskOverlay .task-right {
             display: flex;
-            gap: 4px;
+            gap: 3px;
+            flex-shrink: 0;
+            margin-left: 6px;
         }
 
         #taskOverlay .task-right button {
-            padding: 2px 8px;
+            padding: 2px 6px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             transition: background 0.2s;
         }
 
@@ -425,8 +459,8 @@
         #taskOverlay .btn-delete-sub {
             background: #e74c3c;
             color: white;
-            font-size: 0.65rem;
-            padding: 1px 6px;
+            font-size: 0.6rem;
+            padding: 1px 5px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -440,9 +474,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 3px 8px 3px 30px;
+            padding: 2px 6px 2px 24px;
             border-left: 2px solid #555;
-            margin: 2px 0 2px 10px;
+            margin: 1px 0 1px 8px;
             background: #242424;
             border-radius: 0 4px 4px 0;
         }
@@ -450,20 +484,23 @@
         #taskOverlay .subtask-left {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex: 1;
+            min-width: 0;
         }
 
         #taskOverlay .subtask-left input[type="checkbox"] {
-            width: 14px;
-            height: 14px;
+            width: 13px;
+            height: 13px;
             cursor: pointer;
             accent-color: #27ae60;
+            flex-shrink: 0;
         }
 
         #taskOverlay .subtask-text {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #ddd;
+            word-break: break-word;
         }
 
         #taskOverlay .subtask-text.done {
@@ -473,53 +510,15 @@
 
         #taskOverlay .footer {
             text-align: center;
-            padding-top: 15px;
+            padding-top: 12px;
             color: #666;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             border-top: 1px solid #444;
-            margin-top: 15px;
+            margin-top: 12px;
         }
 
         #taskOverlay .footer span {
             color: #e74c3c;
-        }
-
-        /* ========== TASK OVERLAY TOP BAR ========== */
-        .task-top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            padding: 0 0 5px 0;
-        }
-
-        .task-top-bar .back-link {
-            color: #3498db;
-            text-decoration: none;
-            font-size: 0.9rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 5px 10px;
-        }
-
-        .task-top-bar .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .task-top-bar .color-toggle-btn {
-            color: white;
-            background: rgba(255,255,255,0.15);
-            border: none;
-            border-radius: 6px;
-            padding: 5px 12px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .task-top-bar .color-toggle-btn:hover {
-            background: rgba(255,255,255,0.25);
         }
 
         /* ========== RESPONSIVE ========== */
@@ -531,11 +530,14 @@
                 font-size: 1.6rem;
             }
             #taskOverlay .container {
-                padding: 15px;
+                padding: 12px 15px;
             }
             .task-top-bar {
                 flex-wrap: wrap;
                 gap: 5px;
+            }
+            #taskOverlay .task-list {
+                max-height: 140px;
             }
         }
 
@@ -556,7 +558,10 @@
                 flex-wrap: wrap;
             }
             #taskOverlay .task-right {
-                margin-top: 4px;
+                margin-top: 3px;
+            }
+            #taskOverlay .task-list {
+                max-height: 120px;
             }
         }
     </style>
@@ -599,14 +604,13 @@
     <!-- ========== TASK MANAGER (OVERLAY) ========== -->
     <div id="taskOverlay">
         <div class="container">
-            <!-- Top bar con back link e pulsante colore -->
+            <!-- Top bar con back link e titolo allineato -->
             <div class="task-top-bar">
                 <button class="back-link" onclick="toggleTask()">← Sono qui 📌</button>
-                <button class="color-toggle-btn" onclick="toggleTaskColor()">🎨 Colore sfondo</button>
-            </div>
-            
-            <div class="header">
-                <h1>scrivilo, fallo, <span>stuttù</span> 🫑</h1>
+                <div class="header">
+                    <h1>scrivilo, fallo, <span>stuttù</span> 🫑</h1>
+                </div>
+                <div style="width: 120px; flex-shrink: 0;"></div> <!-- Spazio vuoto per bilanciare -->
             </div>
 
             <div class="grid" id="gridContainer"></div>
@@ -740,37 +744,17 @@
             overlay.classList.toggle('active');
             
             if (overlay.classList.contains('active')) {
+                document.title = "Stuttù 🫑";
                 renderTasks();
+            } else {
+                document.title = "Sono qui 📌";
             }
         }
 
         // ============================================================
-        // 5. TASK MANAGER COLORE (locale e persistente)
-        // ============================================================
-        let taskColor = localStorage.getItem('taskColor') || '#1a1a1a';
-
-        function applyTaskColor(color) {
-            const overlay = document.getElementById('taskOverlay');
-            overlay.style.backgroundColor = color;
-            localStorage.setItem('taskColor', color);
-        }
-
-        function toggleTaskColor() {
-            // Cicla tra alcuni colori predefiniti, oppure usa un selettore
-            const colors = ['#1a1a1a', '#2c3e50', '#4a2c2c', '#1e3a2e', '#3d1f4a'];
-            const current = taskColor;
-            let nextIndex = (colors.indexOf(current) + 1) % colors.length;
-            // Se non trova il colore corrente, parte da 0
-            if (colors.indexOf(current) === -1) nextIndex = 0;
-            taskColor = colors[nextIndex];
-            applyTaskColor(taskColor);
-        }
-
-        // ============================================================
-        // 6. TASK MANAGER (LOGICA E RENDER)
+        // 5. TASK MANAGER (LOGICA E RENDER)
         // ============================================================
         const CATEGORIES = ["urgente, importante", "urgente, non importante", "non urgente, importante", "non urgente, non importante"];
-        // Mappa per associare le vecchie categorie (se presenti) alle nuove
         const CATEGORY_MAP = {
             "FORMICA": "urgente, importante",
             "FARFALLA": "urgente, non importante",
@@ -782,7 +766,6 @@
             try {
                 const data = localStorage.getItem('stuttu_tasks');
                 let tasks = data ? JSON.parse(data) : [];
-                // Conversione delle categorie vecchie → nuove (se presenti)
                 tasks = tasks.map(task => {
                     if (CATEGORY_MAP[task.category]) {
                         task.category = CATEGORY_MAP[task.category];
@@ -974,16 +957,12 @@
         }
 
         // ============================================================
-        // 7. AVVIO
+        // 6. AVVIO
         // ============================================================
         document.getElementById('progressBar').style.backgroundColor = '#b53d19';
         simulaCaricamento();
         setTimeout(leggiStato, 100);
         
-        // Applica colore task salvato
-        applyTaskColor(taskColor);
-        
-        // Inizializza i task (ma non li mostra finché non si apre il toggle)
         renderTasks();
     </script>
 
