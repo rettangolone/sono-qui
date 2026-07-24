@@ -92,25 +92,21 @@
 
     <script>
         // ========== CONFIGURAZIONE ==========
-        const GITHUB_TOKEN = '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';
-        const REPO_OWNER = 'rettangolone';
-        const REPO_NAME = 'sono-qui';
-        const FILE_PATH = 'status.json';
-        const PASSWORD = '1234';
-
+        const BIN_ID = '6a6382aada38895dfe8a6356';
+        const MASTER_KEY = '$2a$10$s8Au.iF5JdkL/N/tRfYs3O4SE1DTgBCBXdT6hfBKVqIaxX7dhNFPi';
+        const PASSWORD = 'YAN';
+        
         // ========== LEGGI STATO ==========
         function leggiStato() {
-            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
                 headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json'
+                    'X-Master-Key': MASTER_KEY
                 }
             })
             .then(response => response.json())
             .then(data => {
-                const content = atob(data.content);
-                const json = JSON.parse(content);
-                aggiornaTesto(json.stato);
+                const stato = data.record.stato;
+                aggiornaTesto(stato);
             })
             .catch(() => {
                 document.getElementById('citta').textContent = 'BOLOGNA';
@@ -128,36 +124,17 @@
             }
         }
 
-        // ========== AGGIORNA STATO (PUT su GitHub) ==========
+        // ========== AGGIORNA STATO (PUT su JSONBin) ==========
         function aggiornaStato(nuovoStato) {
-            // Prima leggi il file per ottenere lo sha attuale
-            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
                 headers: {
-                    'Authorization': `token ${GITHUB_TOKEN}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': MASTER_KEY
+                },
+                body: JSON.stringify({ stato: nuovoStato })
             })
             .then(response => response.json())
-            .then(data => {
-                const sha = data.sha;
-                const newContent = JSON.stringify({ stato: nuovoStato });
-                const encodedContent = btoa(newContent);
-
-                // Ora aggiorna il file
-                return fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: `Stato cambiato a ${nuovoStato}`,
-                        content: encodedContent,
-                        sha: sha
-                    })
-                });
-            })
             .then(() => {
                 aggiornaTesto(nuovoStato);
                 alert('Stato aggiornato a: ' + nuovoStato);
