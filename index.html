@@ -16,22 +16,11 @@
         }
         h1 {
             color: white;
-            font-size: 12vw;
+            font-size: 15vw;
             text-align: center;
             margin: 0;
             padding: 20px;
             word-break: break-word;
-        }
-        #pannelloControllo {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(0,0,0,0.7);
-            padding: 15px;
-            border-radius: 10px;
         }
         #mostraPannello {
             position: fixed;
@@ -44,6 +33,19 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            z-index: 2;
+        }
+        #pannelloControllo {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0,0,0,0.85);
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1;
         }
         .password-input {
             margin-bottom: 10px;
@@ -90,21 +92,25 @@
 
     <script>
         // ========== CONFIGURAZIONE ==========
-        const BIN_ID = 'IL_TUO_BIN_ID';
-        const MASTER_KEY = 'LA_TUA_MASTER_KEY';
+        const GITHUB_TOKEN = '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';
+        const REPO_OWNER = 'rettangolone';
+        const REPO_NAME = 'sono-qui';
+        const FILE_PATH = 'status.json';
         const PASSWORD = '1234';
-        
+
         // ========== LEGGI STATO ==========
         function leggiStato() {
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
                 headers: {
-                    'X-Master-Key': MASTER_KEY
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
                 }
             })
             .then(response => response.json())
             .then(data => {
-                const stato = data.record.stato;
-                aggiornaTesto(stato);
+                const content = atob(data.content);
+                const json = JSON.parse(content);
+                aggiornaTesto(json.stato);
             })
             .catch(() => {
                 document.getElementById('citta').textContent = 'BOLOGNA';
@@ -118,21 +124,40 @@
             } else if (stato === 'B') {
                 document.getElementById('citta').textContent = 'BOLOGNA';
             } else {
-                document.getElementById('citta').textContent = 'OVUNQUE    ';
+                document.getElementById('citta').textContent = 'OVUNQUE';
             }
         }
 
-        // ========== AGGIORNA STATO (PUT) ==========
+        // ========== AGGIORNA STATO (PUT su GitHub) ==========
         function aggiornaStato(nuovoStato) {
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                method: 'PUT',
+            // Prima leggi il file per ottenere lo sha attuale
+            fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': MASTER_KEY
-                },
-                body: JSON.stringify({ stato: nuovoStato })
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
             })
             .then(response => response.json())
+            .then(data => {
+                const sha = data.sha;
+                const newContent = JSON.stringify({ stato: nuovoStato });
+                const encodedContent = btoa(newContent);
+
+                // Ora aggiorna il file
+                return fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({
+                        message: `Stato cambiato a ${nuovoStato}`,
+                        content: encodedContent,
+                        sha: sha
+                    })
+                });
+            })
             .then(() => {
                 aggiornaTesto(nuovoStato);
                 alert('Stato aggiornato a: ' + nuovoStato);
