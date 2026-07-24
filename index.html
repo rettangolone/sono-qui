@@ -13,6 +13,7 @@
             align-items: center;
             font-family: Arial, sans-serif;
             flex-direction: column;
+            transition: background-color 0.3s;
         }
         h1 {
             color: white;
@@ -22,10 +23,18 @@
             padding: 20px;
             word-break: break-word;
         }
-        #mostraPannello {
+        #immagine {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            max-width: 100px;
+            max-height: 100px;
+            z-index: 0;
+        }
+        #mostraPannello {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
             padding: 6px 12px;
             font-size: 12px;
             background: rgba(255,255,255,0.8);
@@ -38,7 +47,7 @@
         #pannelloControllo {
             position: fixed;
             bottom: 40px;
-            right: 20px;
+            left: 20px;
             display: none;
             flex-direction: column;
             align-items: center;
@@ -46,9 +55,10 @@
             padding: 15px;
             border-radius: 10px;
             z-index: 1;
+            gap: 10px;
         }
         .password-input {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .password-input input {
             padding: 5px 8px;
@@ -72,10 +82,29 @@
         #btnB { background: #e74c3c; color: white; }
         #loginBox { display: block; }
         #pulsantiBox { display: none; }
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .color-picker label {
+            color: white;
+            font-size: 12px;
+        }
+        .color-picker input {
+            width: 30px;
+            height: 30px;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            background: none;
+        }
     </style>
 </head>
 <body>
     <h1 id="citta">Caricamento...</h1>
+    
+    <img id="immagine" src="poweredby.png" alt="Immagine">
     
     <button id="mostraPannello" onclick="mostraPannello()">⚙️</button>
     
@@ -87,6 +116,10 @@
         <div class="pulsanti" id="pulsantiBox">
             <button id="btnA" onclick="aggiornaStato('A')">A</button>
             <button id="btnB" onclick="aggiornaStato('B')">B</button>
+            <div class="color-picker">
+                <label for="coloreSfondo">🎨</label>
+                <input type="color" id="coloreSfondo" value="#b53d19" onchange="cambiaColore()">
+            </div>
         </div>
     </div>
 
@@ -94,7 +127,7 @@
         // ========== CONFIGURAZIONE ==========
         const BIN_ID = '6a6382aada38895dfe8a6356';
         const MASTER_KEY = '$2a$10$s8Au.iF5JdkL/N/tRfYs3O4SE1DTgBCBXdT6hfBKVqIaxX7dhNFPi';
-        const PASSWORD = 'YAN';
+        const PASSWORD = 'yan';
         
         // ========== LEGGI STATO ==========
         function leggiStato() {
@@ -106,7 +139,12 @@
             .then(response => response.json())
             .then(data => {
                 const stato = data.record.stato;
+                const colore = data.record.colore;
                 aggiornaTesto(stato);
+                if (colore) {
+                    document.body.style.backgroundColor = colore;
+                    document.getElementById('coloreSfondo').value = colore;
+                }
             })
             .catch(() => {
                 document.getElementById('citta').textContent = 'BOLOGNA';
@@ -126,13 +164,19 @@
 
         // ========== AGGIORNA STATO (PUT su JSONBin) ==========
         function aggiornaStato(nuovoStato) {
+            // Leggi il colore attuale per non perderlo
+            const coloreAttuale = document.body.style.backgroundColor || '#b53d19';
+            
             fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Master-Key': MASTER_KEY
                 },
-                body: JSON.stringify({ stato: nuovoStato })
+                body: JSON.stringify({ 
+                    stato: nuovoStato,
+                    colore: coloreAttuale
+                })
             })
             .then(response => response.json())
             .then(() => {
@@ -141,6 +185,39 @@
             })
             .catch(() => {
                 alert('Errore durante l\'aggiornamento');
+            });
+        }
+
+        // ========== CAMBIA COLORE ==========
+        function cambiaColore() {
+            const colore = document.getElementById('coloreSfondo').value;
+            document.body.style.backgroundColor = colore;
+            
+            // Leggi lo stato attuale per non perderlo
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: {
+                    'X-Master-Key': MASTER_KEY
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const stato = data.record.stato || 'A';
+                // Aggiorna JSONBin con nuovo colore e stato invariato
+                return fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': MASTER_KEY
+                    },
+                    body: JSON.stringify({ 
+                        stato: stato,
+                        colore: colore
+                    })
+                });
+            })
+            .catch(() => {
+                // Se fallisce, salva almeno il colore in localStorage come fallback
+                localStorage.setItem('coloreFallback', colore);
             });
         }
 
