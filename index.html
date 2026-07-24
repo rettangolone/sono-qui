@@ -12,18 +12,128 @@
             justify-content: center;
             align-items: center;
             font-family: Arial, sans-serif;
+            flex-direction: column;
         }
         h1 {
             color: white;
-            font-size: 15vw; /* Adatta alla larghezza dello schermo */
+            font-size: 15vw;
             text-align: center;
             margin: 0;
             padding: 20px;
             word-break: break-word;
         }
+        .pulsanti {
+            margin-top: 30px;
+            display: none;
+        }
+        .pulsanti button {
+            font-size: 24px;
+            padding: 15px 40px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #btnA { background: #2ecc71; color: white; }
+        #btnB { background: #e74c3c; color: white; }
+        .password-input {
+            margin-top: 20px;
+            display: none;
+        }
+        .password-input input {
+            padding: 10px;
+            font-size: 16px;
+        }
+        .password-input button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>BOLOGNA</h1>
+    <h1 id="citta">Caricamento...</h1>
+    
+    <!-- Pannello di controllo (visibile solo con password) -->
+    <div id="pannelloControllo">
+        <div class="password-input" id="loginBox">
+            <input type="password" id="passwordInput" placeholder="Inserisci password">
+            <button onclick="verificaPassword()">Accedi</button>
+        </div>
+        <div class="pulsanti" id="pulsantiBox">
+            <button id="btnA" onclick="aggiornaStato('A')">📍 A</button>
+            <button id="btnB" onclick="aggiornaStato('B')">📍 B</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== CONFIGURAZIONE ==========
+        const BIN_ID = '6a6382aada38895dfe8a6356';          // Sostituisci con il tuo Bin ID
+        const MASTER_KEY = '$2a$10$s8Au.iF5JdkL/N/tRfYs3O4SE1DTgBCBXdT6hfBKVqIaxX7dhNFPi';  // Sostituisci con la tua Master Key
+        const PASSWORD = '1234';                 // Password per vedere i pulsanti
+        
+        // ========== LEGGI STATO ==========
+        function leggiStato() {
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                headers: {
+                    'X-Master-Key': MASTER_KEY
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const stato = data.record.stato;
+                aggiornaTesto(stato);
+            })
+            .catch(() => {
+                document.getElementById('citta').textContent = '📍 BOLOGNA';
+            });
+        }
+
+        // ========== AGGIORNA TESTO ==========
+        function aggiornaTesto(stato) {
+            if (stato === 'A') {
+                document.getElementById('citta').textContent = '📍 MILANO';
+            } else if (stato === 'B') {
+                document.getElementById('citta').textContent = '📍 BOLOGNA';
+            } else {
+                document.getElementById('citta').textContent = '📍 OVUNQUE';
+            }
+        }
+
+        // ========== AGGIORNA STATO (PUT) ==========
+        function aggiornaStato(nuovoStato) {
+            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': MASTER_KEY
+                },
+                body: JSON.stringify({ stato: nuovoStato })
+            })
+            .then(response => response.json())
+            .then(() => {
+                aggiornaTesto(nuovoStato);
+                alert('Stato aggiornato a: ' + nuovoStato);
+            })
+            .catch(() => {
+                alert('Errore durante l\'aggiornamento');
+            });
+        }
+
+        // ========== VERIFICA PASSWORD ==========
+        function verificaPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === PASSWORD) {
+                document.getElementById('loginBox').style.display = 'none';
+                document.getElementById('pulsantiBox').style.display = 'block';
+            } else {
+                alert('Password errata');
+            }
+        }
+
+        // ========== AVVIO ==========
+        leggiStato();
+    </script>
 </body>
 </html>
