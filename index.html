@@ -28,7 +28,7 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.8s ease;
+            transition: opacity 0.8s ease, background-color 0.3s;
         }
         #loadingScreen.hidden {
             opacity: 0;
@@ -162,6 +162,20 @@
             border-top: 1px solid rgba(255,255,255,0.15);
             margin: 2px 0;
         }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 12px;
+            width: 100%;
+            justify-content: center;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            padding-top: 10px;
+        }
+        .checkbox-row input {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -191,6 +205,10 @@
                     <input type="color" id="coloreSfondo" value="#b53d19" onchange="cambiaColore()">
                 </div>
             </div>
+            <div class="checkbox-row">
+                <input type="checkbox" id="sincronizzaLoading" checked>
+                <label for="sincronizzaLoading">Sfondo caricamento</label>
+            </div>
         </div>
     </div>
 
@@ -202,6 +220,8 @@
         
         let statoCorrente = 'A';
         let coloreCorrente = '#b53d19';
+        let coloreLoading = '#b53d19';
+        let sincronizzaLoading = true;
 
         // ========== CARICAMENTO PROGRESSIVO ==========
         function simulaCaricamento() {
@@ -209,6 +229,11 @@
             const progressText = document.getElementById('progressText');
             const loadingScreen = document.getElementById('loadingScreen');
             let progress = 0;
+
+            // Applica colore iniziale
+            if (coloreLoading) {
+                loadingScreen.style.backgroundColor = coloreLoading;
+            }
 
             const interval = setInterval(() => {
                 progress += Math.floor(Math.random() * 10) + 5;
@@ -239,13 +264,25 @@
             .then(data => {
                 const stato = data.record.stato || 'A';
                 const colore = data.record.colore || '#b53d19';
+                const coloreLoad = data.record.coloreLoading || '#b53d19';
+                const sync = data.record.sincronizzaLoading !== undefined ? data.record.sincronizzaLoading : true;
                 
                 statoCorrente = stato;
                 coloreCorrente = colore;
+                coloreLoading = coloreLoad;
+                sincronizzaLoading = sync;
                 
                 aggiornaTesto(stato);
                 document.body.style.backgroundColor = colore;
                 document.getElementById('coloreSfondo').value = colore;
+                document.getElementById('sincronizzaLoading').checked = sync;
+                
+                // Applica colore allo schermo di caricamento se sincronizzato
+                if (sync) {
+                    document.getElementById('loadingScreen').style.backgroundColor = colore;
+                } else {
+                    document.getElementById('loadingScreen').style.backgroundColor = coloreLoad;
+                }
             })
             .catch(() => {
                 document.getElementById('citta').textContent = 'BOLOGNA';
@@ -274,7 +311,9 @@
                 },
                 body: JSON.stringify({
                     stato: statoCorrente,
-                    colore: coloreCorrente
+                    colore: coloreCorrente,
+                    coloreLoading: coloreLoading,
+                    sincronizzaLoading: sincronizzaLoading
                 })
             })
             .catch(() => {
@@ -292,8 +331,27 @@
 
         // ========== CAMBIA COLORE ==========
         function cambiaColore() {
-            coloreCorrente = document.getElementById('coloreSfondo').value;
-            document.body.style.backgroundColor = coloreCorrente;
+            const colore = document.getElementById('coloreSfondo').value;
+            coloreCorrente = colore;
+            document.body.style.backgroundColor = colore;
+            
+            if (sincronizzaLoading) {
+                coloreLoading = colore;
+                document.getElementById('loadingScreen').style.backgroundColor = colore;
+            }
+            
+            salvaStato();
+        }
+
+        // ========== TOGGLE SINCRONIZZAZIONE ==========
+        function toggleSincronizzazione() {
+            sincronizzaLoading = document.getElementById('sincronizzaLoading').checked;
+            
+            if (sincronizzaLoading) {
+                coloreLoading = coloreCorrente;
+                document.getElementById('loadingScreen').style.backgroundColor = coloreCorrente;
+            }
+            
             salvaStato();
         }
 
@@ -319,6 +377,9 @@
         }
 
         // ========== AVVIO ==========
+        // Collega l'evento del checkbox
+        document.getElementById('sincronizzaLoading').addEventListener('change', toggleSincronizzazione);
+        
         simulaCaricamento();
         setTimeout(leggiStato, 100);
     </script>
