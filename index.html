@@ -14,6 +14,7 @@
             font-family: Arial, sans-serif;
             flex-direction: column;
             transition: background-color 0.3s;
+            overflow: hidden;
         }
         h1 {
             color: white;
@@ -22,14 +23,18 @@
             margin: 0;
             padding: 20px;
             word-break: break-word;
+            z-index: 1;
+            pointer-events: none;
         }
         #immagine {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            max-width: 200px;
-            max-height: 200px;
             z-index: 0;
+            cursor: move;
+            max-width: 60vw;
+            max-height: 60vh;
+            transition: width 0.2s, height 0.2s;
+            user-select: none;
+            -webkit-user-drag: none;
         }
         #mostraPannello {
             position: fixed;
@@ -42,7 +47,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            z-index: 2;
+            z-index: 10;
         }
         #pannelloControllo {
             position: fixed;
@@ -52,11 +57,11 @@
             flex-direction: column;
             align-items: center;
             background: rgba(0,0,0,0.85);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
-            z-index: 1;
-            gap: 15px;
-            min-width: 150px;
+            z-index: 10;
+            gap: 10px;
+            min-width: 180px;
         }
         .password-input {
             margin-bottom: 5px;
@@ -76,7 +81,14 @@
             gap: 10px;
             width: 100%;
         }
-        .pulsanti button {
+        .pulsanti-row {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+        .pulsanti-row button {
             font-size: 14px;
             padding: 8px 20px;
             margin: 0;
@@ -84,24 +96,18 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            width: 100%;
+            flex: 1;
         }
-        #btnA { background: #2ecc71; color: white; }
-        #btnB { background: #e74c3c; color: white; }
+        #btn7 { background: #2ecc71; color: white; }
+        #btn90 { background: #e74c3c; color: white; }
         #loginBox { display: block; }
         #pulsantiBox { display: none; }
         .color-picker {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            padding-top: 12px;
             width: 100%;
-        }
-        .color-picker label {
-            color: white;
-            font-size: 12px;
         }
         .color-picker input {
             width: 30px;
@@ -116,12 +122,43 @@
             border-top: 1px solid rgba(255,255,255,0.15);
             margin: 2px 0;
         }
+        .controlli-immagine {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 12px;
+        }
+        .controlli-immagine label {
+            color: white;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .controlli-immagine input[type="range"] {
+            width: 80px;
+            margin: 0 5px;
+        }
+        .controlli-immagine .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: space-between;
+        }
+        .slider-row span {
+            color: white;
+            font-size: 11px;
+            min-width: 30px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <h1 id="citta">Caricamento...</h1>
     
-    <img id="immagine" src="CJ.png" alt="Immagine">
+    <img id="immagine" src="cj2.png" alt="Immagine">
     
     <button id="mostraPannello" onclick="mostraPannello()">⚙️</button>
     
@@ -131,12 +168,30 @@
             <button onclick="verificaPassword()">Accedi</button>
         </div>
         <div class="pulsanti" id="pulsantiBox">
-            <button id="btnA" onclick="aggiornaStato('A')">7</button>
-            <button id="btnB" onclick="aggiornaStato('B')">90</button>
+            <div class="pulsanti-row">
+                <button id="btn7" onclick="aggiornaStato('A')">7</button>
+                <button id="btn90" onclick="aggiornaStato('B')">90</button>
+                <div class="color-picker">
+                    <input type="color" id="coloreSfondo" value="#b53d19" onchange="cambiaColore()">
+                </div>
+            </div>
             <div class="separatore"></div>
-            <div class="color-picker">
-                <label for="coloreSfondo">🎨 Sfondo</label>
-                <input type="color" id="coloreSfondo" value="#b53d19" onchange="cambiaColore()">
+            <div class="controlli-immagine">
+                <div class="slider-row">
+                    <label>📐 Dim.</label>
+                    <input type="range" id="dimensioneImmagine" min="50" max="300" value="200" oninput="cambiaDimensione()">
+                    <span id="dimVal">200</span>
+                </div>
+                <div class="slider-row">
+                    <label>⬅️ X</label>
+                    <input type="range" id="posXImmagine" min="0" max="100" value="80" oninput="cambiaPosizione()">
+                    <span id="posXVal">80</span>
+                </div>
+                <div class="slider-row">
+                    <label>⬆️ Y</label>
+                    <input type="range" id="posYImmagine" min="0" max="100" value="80" oninput="cambiaPosizione()">
+                    <span id="posYVal">80</span>
+                </div>
             </div>
         </div>
     </div>
@@ -147,6 +202,14 @@
         const MASTER_KEY = '$2a$10$s8Au.iF5JdkL/N/tRfYs3O4SE1DTgBCBXdT6hfBKVqIaxX7dhNFPi';
         const PASSWORD = 'yan';
         
+        let statoCorrente = 'A';
+        let coloreCorrente = '#b53d19';
+        let immagineData = {
+            size: 200,
+            x: 80,
+            y: 80
+        };
+
         // ========== LEGGI STATO ==========
         function leggiStato() {
             fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
@@ -156,21 +219,43 @@
             })
             .then(response => response.json())
             .then(data => {
-                const stato = data.record.stato;
-                const colore = data.record.colore;
+                const stato = data.record.stato || 'A';
+                const colore = data.record.colore || '#b53d19';
+                const img = data.record.immagine || { size: 200, x: 80, y: 80 };
+                
+                statoCorrente = stato;
+                coloreCorrente = colore;
+                immagineData = img;
+                
                 aggiornaTesto(stato);
-                if (colore) {
-                    document.body.style.backgroundColor = colore;
-                    document.getElementById('coloreSfondo').value = colore;
-                }
+                document.body.style.backgroundColor = colore;
+                document.getElementById('coloreSfondo').value = colore;
+                
+                // Applica impostazioni immagine
+                const imgEl = document.getElementById('immagine');
+                imgEl.style.width = img.size + 'px';
+                imgEl.style.height = 'auto';
+                imgEl.style.right = (100 - img.x) + '%';
+                imgEl.style.bottom = (100 - img.y) + '%';
+                
+                // Aggiorna slider
+                document.getElementById('dimensioneImmagine').value = img.size;
+                document.getElementById('dimVal').textContent = img.size;
+                document.getElementById('posXImmagine').value = img.x;
+                document.getElementById('posXVal').textContent = img.x;
+                document.getElementById('posYImmagine').value = img.y;
+                document.getElementById('posYVal').textContent = img.y;
             })
             .catch(() => {
                 document.getElementById('citta').textContent = 'BOLOGNA';
+                // Fallback: applica valori di default
+                applicaImpostazioniImmagine();
             });
         }
 
         // ========== AGGIORNA TESTO ==========
         function aggiornaTesto(stato) {
+            statoCorrente = stato;
             if (stato === 'A') {
                 document.getElementById('citta').textContent = 'MILANO';
             } else if (stato === 'B') {
@@ -180,63 +265,61 @@
             }
         }
 
-        // ========== AGGIORNA STATO (PUT su JSONBin) ==========
-        function aggiornaStato(nuovoStato) {
-            // Leggi il colore attuale per non perderlo
-            const coloreAttuale = document.body.style.backgroundColor || '#b53d19';
-            
+        // ========== SALVA STATO SU JSONBIN ==========
+        function salvaStato() {
             fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Master-Key': MASTER_KEY
                 },
-                body: JSON.stringify({ 
-                    stato: nuovoStato,
-                    colore: coloreAttuale
+                body: JSON.stringify({
+                    stato: statoCorrente,
+                    colore: coloreCorrente,
+                    immagine: immagineData
                 })
             })
-            .then(response => response.json())
-            .then(() => {
-                aggiornaTesto(nuovoStato);
-                alert('Stato aggiornato a: ' + nuovoStato);
-            })
             .catch(() => {
-                alert('Errore durante l\'aggiornamento');
+                console.log('Errore durante il salvataggio');
             });
+        }
+
+        // ========== AGGIORNA STATO ==========
+        function aggiornaStato(nuovoStato) {
+            statoCorrente = nuovoStato;
+            aggiornaTesto(nuovoStato);
+            salvaStato();
+            alert('Stato aggiornato a: ' + (nuovoStato === 'A' ? '7' : '90'));
         }
 
         // ========== CAMBIA COLORE ==========
         function cambiaColore() {
-            const colore = document.getElementById('coloreSfondo').value;
-            document.body.style.backgroundColor = colore;
-            
-            // Leggi lo stato attuale per non perderlo
-            fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-                headers: {
-                    'X-Master-Key': MASTER_KEY
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const stato = data.record.stato || 'A';
-                // Aggiorna JSONBin con nuovo colore e stato invariato
-                return fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': MASTER_KEY
-                    },
-                    body: JSON.stringify({ 
-                        stato: stato,
-                        colore: colore
-                    })
-                });
-            })
-            .catch(() => {
-                // Se fallisce, salva almeno il colore in localStorage come fallback
-                localStorage.setItem('coloreFallback', colore);
-            });
+            coloreCorrente = document.getElementById('coloreSfondo').value;
+            document.body.style.backgroundColor = coloreCorrente;
+            salvaStato();
+        }
+
+        // ========== CAMBIA DIMENSIONE IMMAGINE ==========
+        function cambiaDimensione() {
+            const size = parseInt(document.getElementById('dimensioneImmagine').value);
+            immagineData.size = size;
+            document.getElementById('dimVal').textContent = size;
+            document.getElementById('immagine').style.width = size + 'px';
+            document.getElementById('immagine').style.height = 'auto';
+            salvaStato();
+        }
+
+        // ========== CAMBIA POSIZIONE IMMAGINE ==========
+        function cambiaPosizione() {
+            const x = parseInt(document.getElementById('posXImmagine').value);
+            const y = parseInt(document.getElementById('posYImmagine').value);
+            immagineData.x = x;
+            immagineData.y = y;
+            document.getElementById('posXVal').textContent = x;
+            document.getElementById('posYVal').textContent = y;
+            document.getElementById('immagine').style.right = (100 - x) + '%';
+            document.getElementById('immagine').style.bottom = (100 - y) + '%';
+            salvaStato();
         }
 
         // ========== MOSTRA PANNELO ==========
@@ -254,7 +337,7 @@
             const input = document.getElementById('passwordInput').value;
             if (input === PASSWORD) {
                 document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('pulsantiBox').style.display = 'block';
+                document.getElementById('pulsantiBox').style.display = 'flex';
             } else {
                 alert('Password errata');
             }
