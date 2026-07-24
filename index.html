@@ -16,6 +16,56 @@
             transition: background-color 0.3s;
             overflow: hidden;
         }
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #b53d19;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+        #loadingScreen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loadingImage {
+            max-width: 200px;
+            max-height: 200px;
+            margin-bottom: 30px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        #progressContainer {
+            width: 300px;
+            max-width: 80vw;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        #progressBar {
+            width: 0%;
+            height: 100%;
+            background: white;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        #progressText {
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
         h1 {
             color: white;
             font-size: 13vw;
@@ -25,16 +75,6 @@
             word-break: break-word;
             z-index: 1;
             pointer-events: none;
-        }
-        #immagine {
-            position: fixed;
-            z-index: 0;
-            cursor: move;
-            max-width: 60vw;
-            max-height: 60vh;
-            transition: width 0.2s, height 0.2s;
-            user-select: none;
-            -webkit-user-drag: none;
         }
         #mostraPannello {
             position: fixed;
@@ -61,7 +101,7 @@
             border-radius: 10px;
             z-index: 10;
             gap: 10px;
-            min-width: 180px;
+            min-width: 150px;
         }
         .password-input {
             margin-bottom: 5px;
@@ -122,43 +162,19 @@
             border-top: 1px solid rgba(255,255,255,0.15);
             margin: 2px 0;
         }
-        .controlli-immagine {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            padding-top: 12px;
-        }
-        .controlli-immagine label {
-            color: white;
-            font-size: 11px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .controlli-immagine input[type="range"] {
-            width: 80px;
-            margin: 0 5px;
-        }
-        .controlli-immagine .slider-row {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            justify-content: space-between;
-        }
-        .slider-row span {
-            color: white;
-            font-size: 11px;
-            min-width: 30px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
+    <!-- Schermata di caricamento -->
+    <div id="loadingScreen">
+        <img id="loadingImage" src="cj2.png" alt="Caricamento">
+        <div id="progressContainer">
+            <div id="progressBar"></div>
+        </div>
+        <span id="progressText">0%</span>
+    </div>
+
     <h1 id="citta">Caricamento...</h1>
-    
-    <img id="immagine" src="cj2.png" alt="Immagine">
     
     <button id="mostraPannello" onclick="mostraPannello()">⚙️</button>
     
@@ -175,24 +191,6 @@
                     <input type="color" id="coloreSfondo" value="#b53d19" onchange="cambiaColore()">
                 </div>
             </div>
-            <div class="separatore"></div>
-            <div class="controlli-immagine">
-                <div class="slider-row">
-                    <label>📐 Dim.</label>
-                    <input type="range" id="dimensioneImmagine" min="50" max="300" value="200" oninput="cambiaDimensione()">
-                    <span id="dimVal">200</span>
-                </div>
-                <div class="slider-row">
-                    <label>⬅️ X</label>
-                    <input type="range" id="posXImmagine" min="0" max="100" value="80" oninput="cambiaPosizione()">
-                    <span id="posXVal">80</span>
-                </div>
-                <div class="slider-row">
-                    <label>⬆️ Y</label>
-                    <input type="range" id="posYImmagine" min="0" max="100" value="80" oninput="cambiaPosizione()">
-                    <span id="posYVal">80</span>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -204,11 +202,31 @@
         
         let statoCorrente = 'A';
         let coloreCorrente = '#b53d19';
-        let immagineData = {
-            size: 200,
-            x: 80,
-            y: 80
-        };
+
+        // ========== CARICAMENTO PROGRESSIVO ==========
+        function simulaCaricamento() {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const loadingScreen = document.getElementById('loadingScreen');
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 10) + 5;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+
+                if (progress === 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 800);
+                    }, 500);
+                }
+            }, 150);
+        }
 
         // ========== LEGGI STATO ==========
         function leggiStato() {
@@ -221,35 +239,16 @@
             .then(data => {
                 const stato = data.record.stato || 'A';
                 const colore = data.record.colore || '#b53d19';
-                const img = data.record.immagine || { size: 200, x: 80, y: 80 };
                 
                 statoCorrente = stato;
                 coloreCorrente = colore;
-                immagineData = img;
                 
                 aggiornaTesto(stato);
                 document.body.style.backgroundColor = colore;
                 document.getElementById('coloreSfondo').value = colore;
-                
-                // Applica impostazioni immagine
-                const imgEl = document.getElementById('immagine');
-                imgEl.style.width = img.size + 'px';
-                imgEl.style.height = 'auto';
-                imgEl.style.right = (100 - img.x) + '%';
-                imgEl.style.bottom = (100 - img.y) + '%';
-                
-                // Aggiorna slider
-                document.getElementById('dimensioneImmagine').value = img.size;
-                document.getElementById('dimVal').textContent = img.size;
-                document.getElementById('posXImmagine').value = img.x;
-                document.getElementById('posXVal').textContent = img.x;
-                document.getElementById('posYImmagine').value = img.y;
-                document.getElementById('posYVal').textContent = img.y;
             })
             .catch(() => {
                 document.getElementById('citta').textContent = 'BOLOGNA';
-                // Fallback: applica valori di default
-                applicaImpostazioniImmagine();
             });
         }
 
@@ -275,8 +274,7 @@
                 },
                 body: JSON.stringify({
                     stato: statoCorrente,
-                    colore: coloreCorrente,
-                    immagine: immagineData
+                    colore: coloreCorrente
                 })
             })
             .catch(() => {
@@ -296,29 +294,6 @@
         function cambiaColore() {
             coloreCorrente = document.getElementById('coloreSfondo').value;
             document.body.style.backgroundColor = coloreCorrente;
-            salvaStato();
-        }
-
-        // ========== CAMBIA DIMENSIONE IMMAGINE ==========
-        function cambiaDimensione() {
-            const size = parseInt(document.getElementById('dimensioneImmagine').value);
-            immagineData.size = size;
-            document.getElementById('dimVal').textContent = size;
-            document.getElementById('immagine').style.width = size + 'px';
-            document.getElementById('immagine').style.height = 'auto';
-            salvaStato();
-        }
-
-        // ========== CAMBIA POSIZIONE IMMAGINE ==========
-        function cambiaPosizione() {
-            const x = parseInt(document.getElementById('posXImmagine').value);
-            const y = parseInt(document.getElementById('posYImmagine').value);
-            immagineData.x = x;
-            immagineData.y = y;
-            document.getElementById('posXVal').textContent = x;
-            document.getElementById('posYVal').textContent = y;
-            document.getElementById('immagine').style.right = (100 - x) + '%';
-            document.getElementById('immagine').style.bottom = (100 - y) + '%';
             salvaStato();
         }
 
@@ -344,7 +319,8 @@
         }
 
         // ========== AVVIO ==========
-        leggiStato();
+        simulaCaricamento();
+        setTimeout(leggiStato, 100);
     </script>
 </body>
 </html>
