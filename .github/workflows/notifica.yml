@@ -1,0 +1,46 @@
+name: Invia Notifica Stato
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'status.json'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Leggi stato
+        id: leggi
+        run: |
+          STATO=$(cat status.json | jq -r '.stato')
+          if [ "$STATO" == "A" ]; then
+            TESTO="Caro Yan, sono tornato a Milano,
+            
+                   A presto,
+                   Jacques"
+          elif [ "$STATO" == "B" ]; then
+            TESTO="Caro Yan, sono arrivato a Bologna,
+            
+                   Facciamo le cose,
+                   Jacques"
+          else
+            TESTO="Posizione sconosciuta"
+          fi
+          echo "stato=$STATO" >> $GITHUB_OUTPUT
+          echo "testo=$TESTO" >> $GITHUB_OUTPUT
+
+      - name: Invia email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: "Riguardo ai miei recenti spostamenti"
+          to: jacopo.dibenedetto@studio.unibo.it
+          from: jacopo.idb@gmail.com
+          body: |
+            ${{ steps.leggi.outputs.testo }}
