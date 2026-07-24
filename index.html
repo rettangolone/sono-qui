@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Calendario</title>
+    <title>Jaq📌</title>
     <style>
         body {
             background-color: #28562b;
@@ -71,14 +71,32 @@
     <h1>LA TUA SCRITTA QUI</h1>
     <div class="calendario">
         <div class="mese">Luglio 2026</div>
-        <table>
+        <table id="calendario">
             <tr><th>L</th><th>M</th><th>M</th><th>G</th><th>V</th><th>S</th><th>D</th></tr>
             <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
             <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
             <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
-            <tr><td>20</td><td>21</td><td>22</td><td class="cerchiato-blu">23</td><td>24</td><td>25</td><td>26</td></tr>
+            <tr><td>20</td><td>21</td><td>22</td><td>23</td><td id="oggi">24</td><td>25</td><td>26</td></tr>
             <tr><td>27</td><td>28</td><td>29</td><td class="cerchiato-rosso">30</td><td>31</td><td></td><td></td></tr>
         </table>
     </div>
+    <script>
+        // Prende la data di oggi
+        const oggi = new Date();
+        const giornoCorrente = oggi.getDate();
+        const meseCorrente = oggi.getMonth(); // 0=Gennaio, 6=Luglio
+        const annoCorrente = oggi.getFullYear();
+        
+        // Se siamo a Luglio 2026, cerchia la data corrente in blu
+        if (meseCorrente === 6 && annoCorrente === 2026) {
+            const elementoOggi = document.getElementById('oggi');
+            // Rimuovi la classe rossa se presente
+            elementoOggi.classList.remove('cerchiato-rosso');
+            // Aggiungi la classe blu
+            elementoOggi.classList.add('cerchiato-blu');
+            // Cambia il testo con il numero del giorno corrente
+            elementoOggi.textContent = giornoCorrente;
+        }
+    </script>
 </body>
 </html>
