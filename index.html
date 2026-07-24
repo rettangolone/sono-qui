@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Sono qui 📌</title>
+    <title>Sono qui</title>
     <style>
         body {
             background-color: #b53d19;
@@ -22,9 +22,21 @@
             padding: 20px;
             word-break: break-word;
         }
-        .pulsanti {
-            margin-top: 30px;
+        #mostraPannello {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background: white;
+            color: #b53d19;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #pannelloControllo {
+            margin-top: 20px;
             display: none;
+            flex-direction: column;
+            align-items: center;
         }
         .pulsanti button {
             font-size: 24px;
@@ -38,8 +50,7 @@
         #btnA { background: #2ecc71; color: white; }
         #btnB { background: #e74c3c; color: white; }
         .password-input {
-            margin-top: 20px;
-            display: none;
+            margin-bottom: 15px;
         }
         .password-input input {
             padding: 10px;
@@ -55,23 +66,24 @@
 <body>
     <h1 id="citta">Caricamento...</h1>
     
-    <!-- Pannello di controllo (visibile solo con password) -->
+    <button id="mostraPannello" onclick="mostraPannello()">Mostra pannello di controllo</button>
+    
     <div id="pannelloControllo">
         <div class="password-input" id="loginBox">
             <input type="password" id="passwordInput" placeholder="Inserisci password">
             <button onclick="verificaPassword()">Accedi</button>
         </div>
-        <div class="pulsanti" id="pulsantiBox">
-            <button id="btnA" onclick="aggiornaStato('A')">📍 A</button>
-            <button id="btnB" onclick="aggiornaStato('B')">📍 B</button>
+        <div class="pulsanti" id="pulsantiBox" style="display:none;">
+            <button id="btnA" onclick="aggiornaStato('A')">A</button>
+            <button id="btnB" onclick="aggiornaStato('B')">B</button>
         </div>
     </div>
 
     <script>
         // ========== CONFIGURAZIONE ==========
-        const BIN_ID = '6a6382aada38895dfe8a6356';          // Sostituisci con il tuo Bin ID
-        const MASTER_KEY = '$2a$10$s8Au.iF5JdkL/N/tRfYs3O4SE1DTgBCBXdT6hfBKVqIaxX7dhNFPi';  // Sostituisci con la tua Master Key
-        const PASSWORD = '1234';                 // Password per vedere i pulsanti
+        const BIN_ID = 'IL_TUO_BIN_ID';
+        const MASTER_KEY = 'LA_TUA_MASTER_KEY';
+        const PASSWORD = '1234';
         
         // ========== LEGGI STATO ==========
         function leggiStato() {
@@ -86,18 +98,18 @@
                 aggiornaTesto(stato);
             })
             .catch(() => {
-                document.getElementById('citta').textContent = '📍 BOLOGNA';
+                document.getElementById('citta').textContent = 'BOLOGNA';
             });
         }
 
         // ========== AGGIORNA TESTO ==========
         function aggiornaTesto(stato) {
             if (stato === 'A') {
-                document.getElementById('citta').textContent = '📍 MILANO';
+                document.getElementById('citta').textContent = 'BOLOGNA';
             } else if (stato === 'B') {
-                document.getElementById('citta').textContent = '📍 BOLOGNA';
+                document.getElementById('citta').textContent = 'MILANO';
             } else {
-                document.getElementById('citta').textContent = '📍 OVUNQUE';
+                document.getElementById('citta').textContent = 'OVUNQUE';
             }
         }
 
@@ -119,6 +131,16 @@
             .catch(() => {
                 alert('Errore durante l\'aggiornamento');
             });
+        }
+
+        // ========== MOSTRA PANNELO ==========
+        function mostraPannello() {
+            const pannello = document.getElementById('pannelloControllo');
+            if (pannello.style.display === 'flex') {
+                pannello.style.display = 'none';
+            } else {
+                pannello.style.display = 'flex';
+            }
         }
 
         // ========== VERIFICA PASSWORD ==========
