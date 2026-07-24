@@ -2,101 +2,28 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Jaq📌</title>
+    <title>Sono qui 📌</title>
     <style>
         body {
-            background-color: #28562b;
+            background-color: #b53d19;
             height: 100vh;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             font-family: Arial, sans-serif;
-            flex-direction: column;
         }
         h1 {
             color: white;
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 20vw; /* Adatta alla larghezza dello schermo */
             text-align: center;
-        }
-        .calendario {
-            background: white;
-            padding: 0;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 14px;
-            width: 220px;
-            overflow: hidden;
-        }
-        .mese {
-            background-color: #2c3e50;
-            color: white;
-            padding: 8px 0;
-            font-size: 16px;
-            font-weight: bold;
-            border-bottom: 3px solid #e74c3c;
-        }
-        .calendario table {
-            width: 100%;
-            border-collapse: collapse;
-            padding: 8px;
-        }
-        .calendario td, .calendario th {
-            padding: 5px;
-            text-align: center;
-        }
-        .calendario th {
-            font-weight: bold;
-            color: #555;
-        }
-        .calendario table {
-            padding: 9px;
-        }
-        .cerchiato-rosso {
-            background-color: #e74c3c;
-            color: white;
-            border-radius: 50%;
-            font-weight: bold;
-        }
-        .cerchiato-blu {
-            background-color: #3498db;
-            color: white;
-            border-radius: 50%;
-            font-weight: bold;
+            margin: 0;
+            padding: 20px;
+            word-break: break-word;
         }
     </style>
 </head>
 <body>
-    <h1>a Bologna fino a giovedì 30 Luglio</h1>
-    <div class="calendario">
-        <div class="mese">Luglio 2026</div>
-        <table id="calendario">
-            <tr><th>L</th><th>M</th><th>M</th><th>G</th><th>V</th><th>S</th><th>D</th></tr>
-            <tr><td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
-            <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
-            <tr><td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td></tr>
-            <tr><td>20</td><td>21</td><td>22</td><td>23</td><td id="oggi">24</td><td>25</td><td>26</td></tr>
-            <tr><td>27</td><td>28</td><td>29</td><td class="cerchiato-rosso">30</td><td>31</td><td></td><td></td></tr>
-        </table>
-    </div>
-    <script>
-        // Prende la data di oggi
-        const oggi = new Date();
-        const giornoCorrente = oggi.getDate();
-        const meseCorrente = oggi.getMonth(); // 0=Gennaio, 6=Luglio
-        const annoCorrente = oggi.getFullYear();
-        
-        // Se siamo a Luglio 2026, cerchia la data corrente in blu
-        if (meseCorrente === 6 && annoCorrente === 2026) {
-            const elementoOggi = document.getElementById('oggi');
-            // Rimuovi la classe rossa se presente
-            elementoOggi.classList.remove('cerchiato-rosso');
-            // Aggiungi la classe blu
-            elementoOggi.classList.add('cerchiato-blu');
-            // Cambia il testo con il numero del giorno corrente
-            elementoOggi.textContent = giornoCorrente;
-        }
-    </script>
+    <h1>BOLOGNA</h1>
 </body>
 </html>
